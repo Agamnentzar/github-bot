@@ -18,12 +18,14 @@ handler.on('error', err => console.error(err));
 handler.on('issue_comment', event => handleComment(event.payload));
 
 function handleComment(body) {
-  github.issues.editComment({
-    owner: body.repository.owner.login,
-    repo: body.repository.name,
-    id: body.comment.id,
-    body: body.comment.body + ' • c •',
-  }).catch(e => console.error(e));
+  if (body.action === 'created') {
+    github.issues.editComment({
+      owner: body.repository.owner.login,
+      repo: body.repository.name,
+      id: body.comment.id,
+      body: body.comment.body + ' • c •',
+    }).catch(e => console.error(e));
+  }
 }
 
 //const events = require('github-webhook-handler/events');
