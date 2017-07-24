@@ -43,6 +43,7 @@ function handleRequest(req, res) {
   console.log('METHOD: ', req.method);
   console.log('PATH: ', req.path);
   console.log('BODY: ', req.body);
+  console.log('HEADERS: ', req.headers);
   res.send('');
   
   if (req.body.action) {
