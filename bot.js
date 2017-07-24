@@ -9,13 +9,13 @@ github.authenticate({
   token: config.token,
 });
 
-github.issues.getForRepo({
-  owner: 'Agamnentzar',
-  repo: 'release-test',
-})
-  .then(x => x.data.map(i => i.body))
-  .then(x => console.log(x))
-  .catch(e => console.error(e));
+// github.issues.getForRepo({
+//   owner: 'Agamnentzar',
+//   repo: 'release-test',
+// })
+//   .then(x => x.data.map(i => i.body))
+//   .then(x => console.log(x))
+//   .catch(e => console.error(e));
 
 // github.issues.createComment({
 //   owner: 'Agamnentzar',
@@ -43,7 +43,20 @@ function handleRequest(req, res) {
   console.log('METHOD: ', req.method);
   console.log('PATH: ', req.path);
   console.log('BODY: ', req.body);
-  console.log('QUERY: ', req.query);
-  console.log('---------------------');
   res.send('');
+  
+  if (req.body.action) {
+    handleEvent(req.body);
+  }
+}
+
+function handleEvent(body) {
+  if (body.action === 'created' && body.repository && body.issue && body.comment) {
+    github.issues.editComment({
+      owner: body.repository.owner.login,
+      repo: body.repository.name,
+      id: body.comment.id,
+      body: body.comment.body + ' • c •',
+    }).catch(e => console.error(e));
+  }
 }
