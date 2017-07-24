@@ -1,3 +1,5 @@
+const express = require('express');
+const bodyParser = require('body-parser');
 const githubApi = require('github');
 const config = require('./config.json');
 const github = githubApi({});
@@ -23,3 +25,25 @@ github.issues.getForRepo({
 // })
 //   .then(x => console.log(x))
 //   .catch(e => console.error(e));
+
+const app = express();
+
+app.set('port', process.env.PORT || 8095);
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(require('errorhandler')());
+
+app.get('*', handleRequest);
+app.post('*', handleRequest);
+
+app.listen(app.get('port'), () => console.log('Listening on port ' + app.get('port')));
+
+function handleRequest(req, res) {
+  console.log('------ request ------');
+  console.log('METHOD: ', req.method);
+  console.log('PATH: ', req.path);
+  console.log('BODY: ', req.body);
+  console.log('QUERY: ', req.query);
+  console.log('---------------------');
+  res.send('');
+}
