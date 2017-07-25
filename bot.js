@@ -14,43 +14,43 @@ http
 
 handler.on('error', err => console.error(err));
 
-handler.on('issue_comment', ({ body }) => {
+handler.on('issue_comment', ({ payload }) => {
   console.log('issue_comment');
 
-  if (body.action === 'created') {
+  if (payload.action === 'created') {
     // github.issues.editComment({
-    //   owner: body.repository.owner.login,
-    //   repo: body.repository.name,
-    //   id: body.comment.id,
-    //   body: body.comment.body + ' • c •',
+    //   owner: payload.repository.owner.login,
+    //   repo: payload.repository.name,
+    //   id: payload.comment.id,
+    //   body: payload.comment.body + ' • c •',
     // }).catch(e => console.error(e));
-    handleBuild(body, body.comment.body);
+    handleBuild(payload, payload.comment.body);
   }
 });
 
-handler.on('issues', ({ body }) => {
+handler.on('issues', ({ payload }) => {
   console.log('issues');
 
-  if (body.action === 'opened') {
-    handleBuild(body, body.issue.body);
+  if (payload.action === 'opened') {
+    handleBuild(payload, payload.issue.body);
   }
 });
 
-handler.on('pull_request', event => {
+handler.on('pull_request', ({ payload }) => {
   console.log('pull_request');
 
-  console.log(event);
-  // if (body.action === 'opened') {
-  //   handleBuild(body, body.issue.body);
+  console.log(payload);
+  // if (payload.action === 'opened') {
+  //   handleBuild(payload, payload.issue.body);
   // }
 });
 
-function handleBuild(body, text) {
+function handleBuild(payload, text) {
   if (/^\/build\b/m.test(text)) {
     github.issues.createComment({
-      owner: body.repository.owner.login,
-      repo: body.repository.name,
-      number: body.issue.number,
+      owner: payload.repository.owner.login,
+      repo: payload.repository.name,
+      number: payload.issue.number,
       body: 'builds: [windows](http://placekitten.com/200/300), [mac](http://placekitten.com/300/300)',
     }).catch(e => console.error(e));
   }
