@@ -32,7 +32,7 @@ function handleComment(body) {
 
 function handleIssues(body) {
   if (body.action === 'opened') {
-    handleBuild(body);
+    handleBuild(body, body.issue.body);
   }
 }
 
