@@ -26,20 +26,25 @@ function handleComment(body) {
     //   id: body.comment.id,
     //   body: body.comment.body + ' • c •',
     // }).catch(e => console.error(e));
-
-    if (/^\/build\b/m.test(body.comment.body)) {
-      github.issues.createComment({
-        owner: body.repository.owner.login,
-        repo: body.repository.name,
-        number: body.issue.number,
-        body: 'builds: [windows](http://placekitten.com/200/300), [mac](http://placekitten.com/300/300)',
-      }).catch(e => console.error(e));
-    }
+    handleBuild(body, body.comment.body);
   }
 }
 
 function handleIssues(body) {
-  console.log(body);
+  if (body.action === 'opened') {
+    handleBuild(body);
+  }
+}
+
+function handleBuild(body, text) {
+  if (/^\/build\b/m.test(text)) {
+    github.issues.createComment({
+      owner: body.repository.owner.login,
+      repo: body.repository.name,
+      number: body.issue.number,
+      body: 'builds: [windows](http://placekitten.com/200/300), [mac](http://placekitten.com/300/300)',
+    }).catch(e => console.error(e));
+  }
 }
 
 // const events = require('github-webhook-handler/events');
