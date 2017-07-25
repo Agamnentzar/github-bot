@@ -26,9 +26,8 @@ handler.on('issue_comment', ({ payload }) => {
     }).then(pr => {
       console.log('PR')
       console.log(pr);
+      handleBuild(payload, payload.comment.body, pr.data.head.ref, pr.data.head.sha);
     });
-
-    handleBuild(payload, payload.comment.body);
   }
 
   // github.issues.editComment({
@@ -55,9 +54,11 @@ handler.on('pull_request', ({ payload }) => {
   }
 });
 
-function handleBuild(payload, text) {
+function handleBuild(payload, text, branch, sha) {
   if (/^\/build\b/m.test(text)) {
-    const body = 'builds: '
+    const body = 'branch: ' + branch + '\n'
+      + ' sha: ' + sha + '\n'
+      + 'builds: '
       + '[windows](http://www.rd.com/wp-content/uploads/sites/2/2016/02/06-train-cat-shake-hands.jpg), '
       + '[mac](https://static.pexels.com/photos/126407/pexels-photo-126407.jpeg)';
 
