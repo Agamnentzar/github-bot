@@ -15,20 +15,34 @@ function handleRequest(req, res) {
 }
 
 handler.on('error', err => console.error(err));
+handler.on('issues', event => handleIssues(event.payload));
 handler.on('issue_comment', event => handleComment(event.payload));
 
 function handleComment(body) {
   if (body.action === 'created') {
-    github.issues.editComment({
-      owner: body.repository.owner.login,
-      repo: body.repository.name,
-      id: body.comment.id,
-      body: body.comment.body + ' • c •',
-    }).catch(e => console.error(e));
+    // github.issues.editComment({
+    //   owner: body.repository.owner.login,
+    //   repo: body.repository.name,
+    //   id: body.comment.id,
+    //   body: body.comment.body + ' • c •',
+    // }).catch(e => console.error(e));
+
+    if (/^\/build\b/m.test(body.comment.body)) {
+      github.issues.createComment({
+        owner: body.repository.owner.login,
+        repo: body.repository.name,
+        number: body.issue.number,
+        body: 'builds: [windows](http://placekitten.com/200/300), [mac](http://placekitten.com/300/300)',
+      }).catch(e => console.error(e));
+    }
   }
 }
 
-//const events = require('github-webhook-handler/events');
-//Object.keys(events).forEach(e => console.log(e, '=', events[e]));
+function handleIssues(body) {
+  console.log(body);
+}
+
+// const events = require('github-webhook-handler/events');
+// Object.keys(events).forEach(e => console.log(e, '=', events[e]));
 
 console.log('started');
