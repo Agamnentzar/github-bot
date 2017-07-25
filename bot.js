@@ -16,6 +16,7 @@ handler.on('error', err => console.error(err));
 
 handler.on('issue_comment', ({ payload }) => {
   console.log('issue_comment');
+  console.log(payload);
 
   if (payload.action === 'created') {
     // github.issues.editComment({
@@ -39,20 +40,32 @@ handler.on('issues', ({ payload }) => {
 handler.on('pull_request', ({ payload }) => {
   console.log('pull_request');
 
-  console.log(payload);
-  // if (payload.action === 'opened') {
-  //   handleBuild(payload, payload.issue.body);
-  // }
+  if (payload.action === 'opened') {
+    handleBuild(payload, payload.pull_request.body);
+  }
 });
 
 function handleBuild(payload, text) {
   if (/^\/build\b/m.test(text)) {
-    github.issues.createComment({
-      owner: payload.repository.owner.login,
-      repo: payload.repository.name,
-      number: payload.issue.number,
-      body: 'builds: [windows](http://placekitten.com/200/300), [mac](http://placekitten.com/300/300)',
-    }).catch(e => console.error(e));
+    const body = 'builds: '
+      + '[windows](http://www.rd.com/wp-content/uploads/sites/2/2016/02/06-train-cat-shake-hands.jpg), '
+      + '[mac](https://static.pexels.com/photos/126407/pexels-photo-126407.jpeg)';
+
+    if (payload.issue) {
+      github.issues.createComment({
+        owner: payload.repository.owner.login,
+        repo: payload.repository.name,
+        number: payload.issue.number,
+        body: body,
+      }).catch(e => console.error(e));
+    } else {
+      github.pullRequests.createComment({
+        owner: payload.repository.owner.login,
+        repo: payload.repository.name,
+        number: payload.pull_request.number,
+        body: body,
+      }).catch(e => console.error(e));
+    }
   }
 }
 
