@@ -18,21 +18,31 @@ handler.on('issue_comment', ({ payload }) => {
   console.log('issue_comment');
   console.log(payload);
 
-  if (payload.action === 'created') {
-    // github.issues.editComment({
-    //   owner: payload.repository.owner.login,
-    //   repo: payload.repository.name,
-    //   id: payload.comment.id,
-    //   body: payload.comment.body + ' • c •',
-    // }).catch(e => console.error(e));
+  if (payload.action === 'created' && payload.issue.pull_request) {
+    github.pullRequests.get({
+      owner: payload.repository.owner.login,
+      repo: payload.repository.name,
+      number: payload.issue.number,
+    }).then(pr => {
+      console.log('PR')
+      console.log(pr);
+    });
+
     handleBuild(payload, payload.comment.body);
   }
+
+  // github.issues.editComment({
+  //   owner: payload.repository.owner.login,
+  //   repo: payload.repository.name,
+  //   id: payload.comment.id,
+  //   body: payload.comment.body + ' • c •',
+  // }).catch(e => console.error(e));
 });
 
 handler.on('issues', ({ payload }) => {
   console.log('issues');
 
-  if (payload.action === 'opened') {
+  if (payload.action === 'opened' && payload.issue.pull_request) {
     handleBuild(payload, payload.issue.body);
   }
 });
