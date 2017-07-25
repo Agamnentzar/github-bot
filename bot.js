@@ -15,6 +15,8 @@ http
 handler.on('error', err => console.error(err));
 
 handler.on('issue_comment', ({ body }) => {
+  console.log('issue_comment');
+
   if (body.action === 'created') {
     // github.issues.editComment({
     //   owner: body.repository.owner.login,
@@ -27,13 +29,17 @@ handler.on('issue_comment', ({ body }) => {
 });
 
 handler.on('issues', ({ body }) => {
+  console.log('issues');
+
   if (body.action === 'opened') {
     handleBuild(body, body.issue.body);
   }
 });
 
-handler.on('pull_request', ({ body }) => {
-  console.log(body);
+handler.on('pull_request', event => {
+  console.log('pull_request');
+
+  console.log(event);
   // if (body.action === 'opened') {
   //   handleBuild(body, body.issue.body);
   // }
