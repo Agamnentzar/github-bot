@@ -8,17 +8,13 @@ const handler = createHandler({ path: '/', secret: config.secret });
 
 github.authenticate({ type: "oauth", token: config.token });
 
-http.createServer(handleRequest).listen(process.env.PORT || 8095);
-
-function handleRequest(req, res) {
-  handler(req, res, err => res.send('error'));
-}
+http
+  .createServer((req, res) => handler(req, res, err => res.send('error')))
+  .listen(process.env.PORT || 8095);
 
 handler.on('error', err => console.error(err));
-handler.on('issues', event => handleIssues(event.payload));
-handler.on('issue_comment', event => handleComment(event.payload));
 
-function handleComment(body) {
+handler.on('issue_comment', ({ body }) => {
   if (body.action === 'created') {
     // github.issues.editComment({
     //   owner: body.repository.owner.login,
@@ -28,13 +24,20 @@ function handleComment(body) {
     // }).catch(e => console.error(e));
     handleBuild(body, body.comment.body);
   }
-}
+});
 
-function handleIssues(body) {
+handler.on('issues', ({ body }) => {
   if (body.action === 'opened') {
     handleBuild(body, body.issue.body);
   }
-}
+});
+
+handler.on('pull_request', ({ body }) => {
+  console.log(body);
+  // if (body.action === 'opened') {
+  //   handleBuild(body, body.issue.body);
+  // }
+});
 
 function handleBuild(body, text) {
   if (/^\/build\b/m.test(text)) {
@@ -47,7 +50,7 @@ function handleBuild(body, text) {
   }
 }
 
-// const events = require('github-webhook-handler/events');
-// Object.keys(events).forEach(e => console.log(e, '=', events[e]));
+const events = require('github-webhook-handler/events');
+Object.keys(events).forEach(e => console.log(e, '=', events[e]));
 
 console.log('started');
